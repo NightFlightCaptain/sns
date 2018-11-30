@@ -1,0 +1,21 @@
+<html>
+<body>
+<pre>
+    colors: $!{colors}
+
+    #foreach($color in $colors)
+        This is Color $!{foreach.index}: $color, $!{foreach.count}
+    #end
+
+    #foreach($key in $map.keySet())
+        Number: $key, Value: $map.get($key)
+    #end
+
+    #foreach($kv in $map.entrySet())
+        Number: $kv.key, Value: $kv.value
+    #end
+
+
+</pre>
+</body>
+</html>
