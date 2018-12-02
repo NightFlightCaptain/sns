@@ -52,7 +52,7 @@ public class HomeController {
 		for (Question question : questions) {
 			ViewObject vo = new ViewObject();
 			vo.set("question", question);
-			vo.set("user", userService.getUser(userId));
+			vo.set("user", userService.getUser(question.getUserId()));
 			vos.add(vo);
 		}
 		return vos;

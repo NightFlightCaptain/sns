@@ -40,7 +40,7 @@
                 oDv.find('.pressed').removeClass('pressed');
                 oDv.find(bLike ? '.js-like' : '.js-dislike').addClass('pressed');
                 // 更新数量
-                oDv.closest('div.js-comment').find('span.js-voteCount').html(oResult.msg);
+                oDv.closest('div.js-comment').find('span.js-voteCount').html(oResult.message);
             },
             error: function (oResult) {
                 if (oResult.code === 999) {

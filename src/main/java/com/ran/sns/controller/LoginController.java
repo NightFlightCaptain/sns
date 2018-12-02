@@ -99,7 +99,7 @@ public class LoginController {
 		return "login";
 	}
 
-	@RequestMapping(path = "logout",method = {RequestMethod.GET,RequestMethod.POST})
+	@RequestMapping(path = "/logout",method = {RequestMethod.GET,RequestMethod.POST})
 	public String logout(@CookieValue("ticket")String ticket){
 		userService.logout(ticket);
 		return "redirect:/";

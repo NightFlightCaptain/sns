@@ -18,6 +18,9 @@ public class QuestionService {
 	@Autowired
 	private QuestionDAO questionDAO;
 
+	@Autowired
+	private SensitiveService sensitiveService;
+
 	/**
 	 * 如果成功返回问题的id，不成功返回0
 	 * @param question
@@ -25,7 +28,9 @@ public class QuestionService {
 	 */
 	public int addQuestion(Question question){
 		question.setTitle(HtmlUtils.htmlEscape(question.getTitle()));
+		question.setTitle(sensitiveService.filter(question.getTitle()));
 		question.setContent(HtmlUtils.htmlEscape(question.getContent()));
+		question.setContent(sensitiveService.filter(question.getContent()));
 		return questionDAO.addQuestion(question) >0?question.getId():0;
 	}
 
@@ -35,5 +40,9 @@ public class QuestionService {
 
 	public int updateCommentCount(int id,int count){
 		return questionDAO.updateCommentCount(id, count);
+	}
+
+	public Question getQuestionById(int id){
+		return questionDAO.selectById(id);
 	}
 }

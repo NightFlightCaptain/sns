@@ -65,6 +65,12 @@ public class UserService {
 		return map;
 	}
 
+	public static void main(String[] args) {
+		for (int i =0;i<10;i++){
+
+		}
+	}
+
 	public Map<String,Object> login(String username,String password){
 		Map<String,Object> map = new HashMap<String,Object>();
 		if (StringUtils.isBlank(username)){
@@ -98,6 +104,7 @@ public class UserService {
 	}
 
 	public void logout(String ticket){
+		System.out.println(ticket);
 		loginTicketDAO.updateStatus(ticket,1);
 	}
 

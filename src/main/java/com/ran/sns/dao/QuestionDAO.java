@@ -10,7 +10,7 @@ public interface QuestionDAO {
 
 	String TABLE_NAME = " question ";
 	String INSERT_FILEDS = " title,content,user_id,created_date,comment_count ";
-	String SELECT_FILEDS = " id " + INSERT_FILEDS;
+	String SELECT_FILEDS = " id, " + INSERT_FILEDS;
 
 	@Insert({" insert into ", TABLE_NAME, " ( ", INSERT_FILEDS, ")" +
 			" values (#{title},#{content},#{userId},#{createdDate},#{commentCount})"})

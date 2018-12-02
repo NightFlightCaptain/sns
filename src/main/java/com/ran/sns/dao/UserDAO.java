@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Update;
 public interface UserDAO {
 	String TABLE_NAME = "user";
 	String INSERT_FILEDS = " name,password,salt,head_url ";
-	String SELECT_FILEDS = " id "+INSERT_FILEDS;
+	String SELECT_FILEDS = " id, "+INSERT_FILEDS;
 
 	@Insert({" insert into " , TABLE_NAME,"(",INSERT_FILEDS,") " +
 			"values (#{name}, #{password},#{salt},#{headUrl})"})
@@ -24,7 +24,7 @@ public interface UserDAO {
 	User selectByName(String name);
 
 	@Update({" update ",TABLE_NAME," set password = #{password} where id = #{id}"})
-	void updatePassword(int id,String password);
+	void updatePassword(User user);
 
 
 }
