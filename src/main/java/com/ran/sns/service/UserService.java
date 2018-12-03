@@ -104,7 +104,6 @@ public class UserService {
 	}
 
 	public void logout(String ticket){
-		System.out.println(ticket);
 		loginTicketDAO.updateStatus(ticket,1);
 	}
 

@@ -1,10 +1,7 @@
 package com.ran.sns.controller;
 
 import com.ran.sns.model.*;
-import com.ran.sns.service.CommentService;
-import com.ran.sns.service.LikeService;
-import com.ran.sns.service.QuestionService;
-import com.ran.sns.service.UserService;
+import com.ran.sns.service.*;
 import com.ran.sns.util.SnsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +38,9 @@ public class QuestionController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private FollowService followService;
+
 	@RequestMapping(value = "/question/add",method = RequestMethod.POST)
 	@ResponseBody
 	public String addQuestion(@RequestParam("title")String title,@RequestParam("content")String content){
@@ -69,10 +69,10 @@ public class QuestionController {
 		Question question = questionService.getQuestionById(questionId);
 		model.addAttribute("question",question);
 
-		List<Comment> comments = commentService.getCommentByEntity(questionId, EntityType.ENTITY_QUESTION);
-		List<ViewObject> vos = new ArrayList<>();
+		List<Comment> commentList = commentService.getCommentByEntity(questionId, EntityType.ENTITY_QUESTION);
+		List<ViewObject> comments = new ArrayList<>();
 
-		for(Comment comment:comments){
+		for(Comment comment:commentList){
 			ViewObject vo = new ViewObject();
 			vo.set("comment",comment);
 			// 当前用户对该回答是否喜欢（点赞）
@@ -83,10 +83,31 @@ public class QuestionController {
 			}
 			vo.set("likeCount",likeService.getLikeCount(EntityType.ENTITY_COMMENT,comment.getId()));
 			vo.set("user",userService.getUser(comment.getUserId()));
-			vos.add(vo);
+			comments.add(vo);
 		}
 
-		model.addAttribute("comments",vos);
+		model.addAttribute("comments",comments);
+
+		List<ViewObject> followUsers = new ArrayList<>();
+		List<Integer> users = followService.getFollowers(EntityType.ENTITY_QUESTION,questionId,20);
+		for(Integer userId :users){
+			ViewObject vo = new ViewObject();
+			User user = userService.getUser(userId);
+			if (user == null){
+				continue;
+			}
+			vo.set("name",user.getName());
+			vo.set("headUrl",user.getHeadUrl());
+			vo.set("id",user.getId());
+			followUsers.add(vo);
+		}
+		model.addAttribute("followers",followUsers);
+
+		if (hostHolder.getUser()!=null){
+			model.addAttribute("followed",followService.isFollower(hostHolder.getUser().getId(),EntityType.ENTITY_QUESTION,questionId));
+		}else {
+			model.addAttribute("followed",false);
+		}
 
 		return "detail";
 	}

@@ -1,5 +1,8 @@
 package com.ran.sns.controller;
 
+import com.ran.sns.async.EventModel;
+import com.ran.sns.async.EventProducer;
+import com.ran.sns.async.EventType;
 import com.ran.sns.model.Comment;
 import com.ran.sns.model.EntityType;
 import com.ran.sns.model.HostHolder;
@@ -36,29 +39,39 @@ public class LikeController {
 	@Autowired
 	JedisAdapter jedisAdapter;
 
-	@RequestMapping(path = "/like",method = RequestMethod.POST)
+	@Autowired
+	EventProducer eventProducer;
+
+	@RequestMapping(path = "/like", method = RequestMethod.POST)
 	@ResponseBody
-	public String like(@RequestParam("commentId")int commentId){
-		if(hostHolder.getUser()==null){
+	public String like(@RequestParam("commentId") int commentId) {
+		if (hostHolder.getUser() == null) {
 			return SnsUtil.getJSONString(999);
 		}
 		Comment comment = commentService.getCommentById(commentId);
 
-		long likeCount = likeService.like(hostHolder.getUser().getId(), EntityType.ENTITY_COMMENT,commentId);
+		eventProducer.fireEvent(new EventModel(EventType.LIKE)
+				.setActorId(hostHolder.getUser().getId())
+				.setEntityType(EntityType.ENTITY_COMMENT)
+				.setEntityId(commentId)
+				.setEntityOwnerId(comment.getUserId())
+				.setExt("questionId", String.valueOf(comment.getEntityId())));
 
-		return SnsUtil.getJSONString(0,String.valueOf(likeCount));
+		long likeCount = likeService.like(hostHolder.getUser().getId(), EntityType.ENTITY_COMMENT, commentId);
+
+		return SnsUtil.getJSONString(0, String.valueOf(likeCount));
 	}
 
 
-	@RequestMapping(path = "/dislike",method = RequestMethod.POST)
+	@RequestMapping(path = "/dislike", method = RequestMethod.POST)
 	@ResponseBody
-	public String dislike(@RequestParam("commentId")int commentId){
-		if(hostHolder.getUser()==null){
+	public String dislike(@RequestParam("commentId") int commentId) {
+		if (hostHolder.getUser() == null) {
 			return SnsUtil.getJSONString(999);
 		}
 		Comment comment = commentService.getCommentById(commentId);
 
-		long likeCount = likeService.disLike(hostHolder.getUser().getId(), EntityType.ENTITY_COMMENT,commentId);
-		return SnsUtil.getJSONString(0,String.valueOf(likeCount));
+		long likeCount = likeService.disLike(hostHolder.getUser().getId(), EntityType.ENTITY_COMMENT, commentId);
+		return SnsUtil.getJSONString(0, String.valueOf(likeCount));
 	}
 }
