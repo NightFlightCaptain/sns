@@ -73,6 +73,7 @@ public class HomeController {
 		vo.set("commentCount",commentService.getCountByUserId(userId));
 		vo.set("followerCount",followService.getFollowerCount(EntityType.ENTITY_USER,userId));
 		vo.set("followeeCount",followService.getFolloweeCount(userId,EntityType.ENTITY_USER));
+		vo.set("followed",followService.isFollower(hostHolder.getUser().getId(), EntityType.ENTITY_USER,userId));
 		model.addAttribute("profileUser",vo);
 		return "profile";
 	}

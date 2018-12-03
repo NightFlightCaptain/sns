@@ -1,9 +1,13 @@
 package com.ran.sns.controller;
 
+import com.ran.sns.async.EventModel;
+import com.ran.sns.async.EventProducer;
+import com.ran.sns.async.EventType;
 import com.ran.sns.model.Comment;
 import com.ran.sns.model.EntityType;
 import com.ran.sns.model.HostHolder;
 import com.ran.sns.service.CommentService;
+import com.ran.sns.service.QuestionService;
 import com.ran.sns.util.SnsUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,27 +34,43 @@ public class CommentController {
 	@Autowired
 	private CommentService commentService;
 
+	@Autowired
+	EventProducer eventProducer;
 
-	@RequestMapping(path = "/addComment",method = RequestMethod.POST)
-	public String addComment(@RequestParam("questionId")int questionId,
-	                         @RequestParam("content")String content){
+	@Autowired
+	QuestionService questionService;
+
+
+	@RequestMapping(path = "/addComment", method = RequestMethod.POST)
+	public String addComment(@RequestParam("questionId") int questionId,
+	                         @RequestParam("content") String content) {
 		try {
 			Comment comment = new Comment();
 			comment.setContent(content);
 			comment.setCreatedDate(new Date());
 			comment.setEntityId(questionId);
 			comment.setEntityType(EntityType.ENTITY_QUESTION);
-			if (hostHolder.getUser() == null){
+			if (hostHolder.getUser() == null) {
 				comment.setUserId(SnsUtil.ANONYMOUS_USERID);
-			}else {
+			} else {
 				comment.setUserId(hostHolder.getUser().getId());
 			}
 			commentService.addComment(comment);
 
+			int count = commentService.getCommentCount(comment.getEntityId(),comment.getEntityType());
+			questionService.updateCommentCount(questionId,count);
+
+			eventProducer.fireEvent(new EventModel(EventType.COMMIT)
+					.setActorId(hostHolder.getUser().getId())
+					.setEntityType(EntityType.ENTITY_QUESTION)
+					.setEntityId(questionId)
+					.setEntityOwnerId(questionService.getQuestionById(questionId).getUserId())
+			);
+
 		} catch (Exception e) {
-			LOGGER.error("添加评论出错",e.getMessage());
+			LOGGER.error("添加评论出错", e.getMessage());
 		}
-		return "redirect:/question/"+questionId;
+		return "redirect:/question/" + questionId;
 	}
 
 }
