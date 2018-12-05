@@ -25,7 +25,7 @@ public class UserService {
 	LoginTicketDAO loginTicketDAO;
 
 
-	public User selectByName(String name){
+	public User getByName(String name){
 		return userDAO.selectByName(name);
 	}
 

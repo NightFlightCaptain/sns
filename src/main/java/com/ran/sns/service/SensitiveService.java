@@ -145,8 +145,4 @@ public class SensitiveService implements InitializingBean{
 	}
 
 
-	public static void main(String[] args) {
-		SensitiveService sensitiveService = new SensitiveService();
-		System.out.println(sensitiveService.filter("你好色情啊"));
-	}
 }
