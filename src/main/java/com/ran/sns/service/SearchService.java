@@ -31,6 +31,7 @@ public class SearchService {
 
 	/**
 	 * 搜索出的Question只有id，title，content三个属性
+	 *
 	 * @param keyword
 	 * @param offset
 	 * @param count
@@ -39,7 +40,8 @@ public class SearchService {
 	 * @return
 	 * @throws Exception
 	 */
-	public List<Question> searchQuestion(String keyword, int offset, int count, String hlPre, String hlPos) throws Exception {
+	public List<Question> searchQuestion(String keyword, int offset, int count,
+	                                     String hlPre, String hlPos) throws Exception {
 		List<Question> questionList = new ArrayList<>();
 		SolrQuery query = new SolrQuery(keyword);
 		query.setRows(count);
@@ -47,9 +49,11 @@ public class SearchService {
 		query.setHighlight(true);
 		query.setHighlightSimplePre(hlPre);
 		query.setHighlightSimplePost(hlPos);
+		query.setHighlightFragsize(100000);
 
 		query.set("hl.fl", QUESTION_TITLE_FIELD + "," + QUESTION_CONTENT_FIELD);
 
+		System.out.println(query);
 		QueryResponse response = httpSolrClient.query(query);
 
 		for (Map.Entry<String, Map<String, List<String>>> entry : response.getHighlighting().entrySet()) {
@@ -66,18 +70,18 @@ public class SearchService {
 			if (entry.getValue().containsKey(QUESTION_CONTENT_FIELD)) {
 				List<String> contentList = entry.getValue().get(QUESTION_CONTENT_FIELD);
 				if (contentList.size() > 0) {
-					q.setTitle(contentList.get(0));
+					q.setContent(contentList.get(0));
 				}
 			}
 			questionList.add(q);
 
 		}
-
 		return questionList;
 	}
 
 	/**
 	 * 新增一个问题时，将该问题添加到搜索引擎中
+	 *
 	 * @param questionId
 	 * @param title
 	 * @param content
